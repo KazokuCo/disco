@@ -1,0 +1,7 @@
+name: Genji
+services:
+  - load: discord
+    jobs:
+      - load: debug
+  # - load: discourse
+  #   url: https://forum.rokkenjima.org
