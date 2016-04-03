@@ -61,8 +61,22 @@ func (srv *Service) Store() bot.Store {
 
 func (srv *Service) Start(store bot.Store) {
 	st := store.(*Store)
-	log.Info("Discord: Starting...")
-	log.WithFields(log.Fields{
-		"username": st.Auth.Username,
-	}).Info("Auth")
+	log.WithField("username", st.Auth.Username).Info("Discord: Starting...")
+
+	// Try to connect using an auth token first, otherwise fall back to username + password; in
+	// case the token has expired and been re-issued, always store the latest one
+	session, err := discordgo.New(st.Auth.Username, st.Auth.Password, st.Auth.Token)
+	if err != nil {
+		log.WithError(err).Fatal("Couldn't connect to Discord")
+	}
+	st.Auth.Token = session.Token
+
+	session.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		log.WithFields(log.Fields{
+			"text": m.Content,
+			"time": m.Timestamp,
+		}).Info("Message")
+	})
+
+	err = session.Open()
 }
