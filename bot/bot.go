@@ -8,7 +8,7 @@ func New() Bot {
 	return Bot{}
 }
 
-func (bot *Bot) Run(brain *Brain) error {
+func (bot *Bot) Run(brain *Brain, stop <-chan interface{}) error {
 	for i := range bot.Services {
 		service := bot.Services[i]
 		store, err := brain.Get(TypeService, service.Load)
@@ -17,6 +17,9 @@ func (bot *Bot) Run(brain *Brain) error {
 		}
 		service.Impl.Start(store)
 	}
+
+	// Wait for a stop signal
+	<-stop
 
 	return nil
 }
