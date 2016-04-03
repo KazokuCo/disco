@@ -51,7 +51,6 @@ func (srv *Service) Store() bot.Store {
 
 func (srv *Service) Start(store bot.Store) {
 	st := store.(*Store)
-	st.Auth.Username = "aaaa"
 	log.Info("Discord: Starting...")
 	log.WithFields(log.Fields{
 		"username": st.Auth.Username,

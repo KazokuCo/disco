@@ -39,7 +39,7 @@ func actionRun(c *cli.Context) {
 		log.WithError(err).Fatal("Couldn't load brain")
 	}
 
-	err = b.Run(brain)
+	err = b.Run(&brain)
 	if err != nil {
 		log.WithError(err).Fatal("Error")
 	}

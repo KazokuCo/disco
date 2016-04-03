@@ -8,7 +8,7 @@ func New() Bot {
 	return Bot{}
 }
 
-func (bot *Bot) Run(brain Brain) error {
+func (bot *Bot) Run(brain *Brain) error {
 	for i := range bot.Services {
 		service := bot.Services[i]
 		store, err := brain.Get(TypeService, service.Load)
