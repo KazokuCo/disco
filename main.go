@@ -42,6 +42,12 @@ func main() {
 			Usage:     "Runs a bot",
 			Action:    actionRun,
 		},
+		cli.Command{
+			Name:      "login",
+			ArgsUsage: "bot.yml service",
+			Usage:     "Logs into the specified service",
+			Action:    actionLogin,
+		},
 	}
 	app.Run(os.Args)
 }

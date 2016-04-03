@@ -15,7 +15,7 @@ type Service interface {
 
 	// Interactively authorizes the bot with the remote service.
 	// Return whether changes to the bot's brain should be persisted.
-	Authorize(store Store) bool
+	Login(store Store) bool
 }
 
 type ServiceRef struct {

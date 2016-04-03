@@ -26,7 +26,7 @@ func New() *Service {
 	return &Service{}
 }
 
-func (srv *Service) Authorize(store bot.Store) bool {
+func (srv *Service) Login(store bot.Store) bool {
 	st := store.(*Store)
 	s := bufio.NewScanner(os.Stdin)
 
