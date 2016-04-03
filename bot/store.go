@@ -17,8 +17,8 @@ type StoreRef struct {
 
 func (ref *StoreRef) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var loadRef struct {
-		Type string
-		Load string
+		Type string `yaml:"__type"`
+		Load string `yaml:"__load"`
 	}
 
 	if err := unmarshal(&loadRef); err != nil {
@@ -52,7 +52,7 @@ func (ref StoreRef) MarshalYAML() (interface{}, error) {
 	if err = yaml.Unmarshal(implData, implMap); err != nil {
 		return nil, err
 	}
-	implMap["type"] = ref.Type
-	implMap["load"] = ref.Load
+	implMap["__type"] = ref.Type
+	implMap["__load"] = ref.Load
 	return implMap, nil
 }
