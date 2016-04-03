@@ -8,8 +8,15 @@ func New() Bot {
 	return Bot{}
 }
 
-func (bot *Bot) Run() {
+func (bot *Bot) Run(brain Brain) error {
 	for i := range bot.Services {
-		bot.Services[i].Impl.Start()
+		service := bot.Services[i]
+		store, err := brain.Get(TypeService, service.Load)
+		if err != nil {
+			return err
+		}
+		service.Impl.Start(store)
 	}
+
+	return nil
 }

@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
 	"github.com/kazokuco/disco/bot"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"os"
 )
 
 func actionRun(c *cli.Context) {
@@ -18,14 +20,30 @@ func actionRun(c *cli.Context) {
 	filename := args[0]
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.WithError(err).Fatal("Couldn't open file")
+		log.WithError(err).Fatal("Couldn't load bot")
 	}
 
 	b := bot.New()
-	err = yaml.Unmarshal(data, &b)
-	if err != nil {
-		log.WithError(err).Fatal("Couldn't load config")
+	if err = yaml.Unmarshal(data, &b); err != nil {
+		log.WithError(err).Fatal("Couldn't load bot")
 	}
 
-	b.Run()
+	brainFilename := fmt.Sprintf("%s.brain", filename)
+	brainData, err := ioutil.ReadFile(brainFilename)
+	if err != nil && !os.IsNotExist(err) {
+		log.WithError(err).Fatal("Couldn't load brain")
+	}
+
+	brain := bot.NewBrain()
+	if err = yaml.Unmarshal(brainData, &brain); err != nil {
+		log.WithError(err).Fatal("Couldn't load brain")
+	}
+
+	err = b.Run(brain)
+	if err != nil {
+		log.WithError(err).Fatal("Error")
+	}
+
+	brainData, err = yaml.Marshal(brain)
+	ioutil.WriteFile(brainFilename, brainData, 0644)
 }
