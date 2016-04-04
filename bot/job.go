@@ -27,5 +27,5 @@ func (ref *JobRef) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return errors.New(fmt.Sprintf("Job not found: %s", loadRef.Load))
 	}
 
-	return nil
+	return unmarshal(ref.Impl)
 }
