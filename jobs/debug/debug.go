@@ -18,9 +18,18 @@ func New() *Job {
 }
 
 func (j *Job) DiscordInit(srv *discord.Service) {
-	srv.Session.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+	session := srv.Session
+	session.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		channel, err := session.State.Channel(m.ChannelID)
+		if err != nil {
+			log.WithError(err).WithFields(log.Fields{
+				"id": m.ChannelID,
+			}).Error("Couldn't get message's channel")
+			return
+		}
 		log.WithFields(log.Fields{
-			"text": m.Content,
+			"text":    m.Content,
+			"channel": channel.Name,
 		}).Info("Message")
 	})
 }
