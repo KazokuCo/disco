@@ -12,8 +12,14 @@ func init() {
 	bot.RegisterService("discord", func() bot.Service { return New() })
 }
 
+type Job interface {
+	DiscordInit(srv *Service)
+}
+
 type Service struct {
 	Jobs []bot.JobRef
+
+	Session *discordgo.Session `yaml:"-"`
 }
 
 type Store struct {
@@ -69,14 +75,17 @@ func (srv *Service) Start(store bot.Store) {
 	if err != nil {
 		log.WithError(err).Fatal("Couldn't connect to Discord")
 	}
-	st.Auth.Token = session.Token
+	srv.Session = session
+	st.Auth.Token = srv.Session.Token
 
-	session.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
-		log.WithFields(log.Fields{
-			"text": m.Content,
-			"time": m.Timestamp,
-		}).Info("Message")
-	})
+	for i := range srv.Jobs {
+		ref := srv.Jobs[i]
+		job, ok := ref.Impl.(Job)
+		if !ok {
+			log.WithField("job", ref.Load).Fatal("Job does not support Discord")
+		}
+		job.DiscordInit(srv)
+	}
 
-	err = session.Open()
+	err = srv.Session.Open()
 }
