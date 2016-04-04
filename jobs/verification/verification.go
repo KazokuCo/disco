@@ -72,7 +72,6 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 			log.WithError(err).WithField("name", j.Grant).Error("Couldn't get role to grant")
 			return
 		}
-		log.WithField("grant", grant).Info("Grant")
 
 		urls := xurls.Strict.FindAllString(m.Content, -1)
 		for i := range urls {
