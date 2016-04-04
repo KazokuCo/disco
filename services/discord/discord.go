@@ -2,6 +2,7 @@ package discord
 
 import (
 	"bufio"
+	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/bwmarrin/discordgo"
 	"github.com/kazokuco/disco/bot"
@@ -88,4 +89,8 @@ func (srv *Service) Start(store bot.Store) {
 	}
 
 	err = srv.Session.Open()
+}
+
+func (srv *Service) Reply(m *discordgo.Message, text string) {
+	srv.Session.ChannelMessageSend(m.ChannelID, fmt.Sprintf("<@%s> %s", m.Author.ID, text))
 }
