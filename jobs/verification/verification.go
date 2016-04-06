@@ -2,6 +2,7 @@ package verification
 
 import (
 	"encoding/json"
+	"errors"
 	log "github.com/Sirupsen/logrus"
 	"github.com/bwmarrin/discordgo"
 	"github.com/kazokuco/disco/bot"
@@ -22,8 +23,9 @@ type Job struct {
 	Channel   string
 	Grant     string
 	Discourse struct {
-		URL     string
-		TopicID int `yaml:"topic_id"`
+		RawURL  string   `yaml:"url"`
+		TopicID int      `yaml:"topic_id"`
+		URL     *url.URL `yaml:"-"`
 	}
 	Lines struct {
 		Success       string
@@ -40,7 +42,24 @@ func New() *Job {
 	return &job
 }
 
+func (j *Job) Init() (err error) {
+	// Parse the forum base URL
+	if j.Discourse.RawURL != "" {
+		j.Discourse.URL, err = url.Parse(j.Discourse.RawURL)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (j *Job) DiscordInit(srv *discord.Service) {
+	if err := j.Init(); err != nil {
+		log.WithError(err).Error("Verification Init failed")
+		return
+	}
+
 	session := srv.Session
 	session.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		// This doesn't get me a GuildID for some reason?
@@ -72,35 +91,42 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 			return
 		}
 
-		urls := xurls.Strict.FindAllString(m.Content, -1)
+		urls, err := j.ParseLinks(m.Content)
+		if err != nil {
+			log.WithError(err).Error("Couldn't parse message URLs")
+			return
+		}
 		for i := range urls {
-			if !strings.HasPrefix(urls[i], j.Discourse.URL+"/t/") {
+			u := urls[i]
+
+			// Ignore links not to topics
+			if !strings.HasPrefix(u.Path, "/t/") {
 				continue
 			}
 
-			u, err := url.Parse(urls[i])
+			// Parse the topic ID from the URL
+			topicID, postID, err := ParseDiscourseTopicURL(u)
 			if err != nil {
-				log.WithError(err).WithField("url", u).Warn("Couldn't parse URL")
+				log.WithError(err).Warn("Failed to parse post URL")
 				continue
 			}
 
-			pathParts := strings.Split(u.Path, "/")
-			postID, err := strconv.Atoi(pathParts[len(pathParts)-1])
-			if err != nil {
-				log.WithError(err).Warn("Couldn't get post ID")
+			// Ignore posts in the wrong topic
+			if topicID != j.Discourse.TopicID {
+				continue
 			}
 
-			u.RawQuery = ""
-			jsonURL := u.String() + ".json"
-			res, err := http.Get(jsonURL)
+			// Get the JSON for the topic
+			res, err := GetJSON(u.String())
+			defer res.Body.Close()
 			if err != nil || (res.StatusCode != 200 && res.StatusCode != 404) {
 				log.WithError(err).WithField("status", res.StatusCode).Warn("Couldn't fetch JSON")
 				srv.Reply(m.Message, j.Lines.Error)
 				continue
 			}
-			defer res.Body.Close()
-
 			body, _ := ioutil.ReadAll(res.Body)
+
+			// Parse it into a subset of the topic JSON structure
 			var data struct {
 				ID         int `json:"id"`
 				PostStream struct {
@@ -117,6 +143,12 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 				continue
 			}
 
+			// Double-check that this is the right topic
+			if data.ID != j.Discourse.TopicID {
+				continue
+			}
+
+			// Loop through posts until we find the one linked one
 			for i := range data.PostStream.Posts {
 				post := data.PostStream.Posts[i]
 				if post.PostNumber != postID {
@@ -129,12 +161,12 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 				}
 
 				member, err := srv.Session.State.Member(channel.GuildID, m.Author.ID)
-				log.WithField("member", member).Info("Member")
 				if err != nil {
 					log.WithError(err).Warn("Couldn't get member info")
 					break
 				}
 				roles := append(member.Roles, grant.ID)
+
 				err = srv.Session.GuildMemberEdit(channel.GuildID, member.User.ID, roles)
 				if err != nil {
 					log.WithError(err).WithFields(log.Fields{
@@ -150,4 +182,47 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 			}
 		}
 	})
+}
+
+func (j *Job) ParseLinks(text string) (urls []*url.URL, err error) {
+	// Find all URLs in the post
+	raw := xurls.Strict.FindAllString(text, -1)
+	for i := range raw {
+		// On the off chance that the URL does not parse, skip it
+		u, err := url.Parse(raw[i])
+		if err != nil {
+			continue
+		}
+		// Only add URLs matching the configured host
+		if u.Host == j.Discourse.URL.Host {
+			urls = append(urls, u)
+		}
+	}
+	return urls, nil
+}
+
+func ParseDiscourseTopicURL(u *url.URL) (topic, post int, err error) {
+	parts := strings.Split(u.Path, "/")
+	if len(parts) < 2 {
+		return 0, 0, errors.New("Not enough parts in the URL")
+	}
+	topic, err = strconv.Atoi(parts[len(parts)-2])
+	if err != nil {
+		return topic, post, err
+	}
+	post, err = strconv.Atoi(parts[len(parts)-1])
+	if err != nil {
+		return topic, post, err
+	}
+	return topic, post, nil
+}
+
+func GetJSON(u string) (res *http.Response, err error) {
+	client := http.Client{}
+	req, err := http.NewRequest("GET", u, nil)
+	if err != nil {
+		return res, err
+	}
+	req.Header.Add("Accept", "application/json")
+	return client.Do(req)
 }
