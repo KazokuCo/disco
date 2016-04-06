@@ -91,7 +91,7 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 			return
 		}
 
-		urls, err := j.ParseLinks(m.Content)
+		urls, err := ParseLinks(m.Content, j.Discourse.URL)
 		if err != nil {
 			log.WithError(err).Error("Couldn't parse message URLs")
 			return
@@ -184,7 +184,7 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 	})
 }
 
-func (j *Job) ParseLinks(text string) (urls []*url.URL, err error) {
+func ParseLinks(text string, baseURL *url.URL) (urls []*url.URL, err error) {
 	// Find all URLs in the post
 	raw := xurls.Strict.FindAllString(text, -1)
 	for i := range raw {
@@ -194,7 +194,7 @@ func (j *Job) ParseLinks(text string) (urls []*url.URL, err error) {
 			continue
 		}
 		// Only add URLs matching the configured host
-		if u.Host == j.Discourse.URL.Host {
+		if u.Host == baseURL.Host {
 			urls = append(urls, u)
 		}
 	}
