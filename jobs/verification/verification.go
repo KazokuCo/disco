@@ -119,32 +119,34 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 
 			for i := range data.PostStream.Posts {
 				post := data.PostStream.Posts[i]
-				if post.PostNumber == postID {
-					if !strings.Contains(post.Cooked, m.Author.Username) {
-						srv.Reply(m.Message, j.Lines.NameNotInPost)
-						break
-					}
-
-					member, err := srv.Session.State.Member(channel.GuildID, m.Author.ID)
-					log.WithField("member", member).Info("Member")
-					if err != nil {
-						log.WithError(err).Warn("Couldn't get member info")
-						break
-					}
-					roles := append(member.Roles, grant.ID)
-					err = srv.Session.GuildMemberEdit(channel.GuildID, member.User.ID, roles)
-					if err != nil {
-						log.WithError(err).WithFields(log.Fields{
-							"gid":   member.GuildID,
-							"uid":   member.User.ID,
-							"roles": roles,
-						}).Error("Couldn't grant role")
-						srv.Reply(m.Message, j.Lines.Error)
-						break
-					}
-
-					srv.Reply(m.Message, j.Lines.Success)
+				if post.PostNumber != postID {
+					continue
 				}
+
+				if !strings.Contains(post.Cooked, m.Author.Username) {
+					srv.Reply(m.Message, j.Lines.NameNotInPost)
+					break
+				}
+
+				member, err := srv.Session.State.Member(channel.GuildID, m.Author.ID)
+				log.WithField("member", member).Info("Member")
+				if err != nil {
+					log.WithError(err).Warn("Couldn't get member info")
+					break
+				}
+				roles := append(member.Roles, grant.ID)
+				err = srv.Session.GuildMemberEdit(channel.GuildID, member.User.ID, roles)
+				if err != nil {
+					log.WithError(err).WithFields(log.Fields{
+						"gid":   member.GuildID,
+						"uid":   member.User.ID,
+						"roles": roles,
+					}).Error("Couldn't grant role")
+					srv.Reply(m.Message, j.Lines.Error)
+					break
+				}
+
+				srv.Reply(m.Message, j.Lines.Success)
 			}
 		}
 	})
