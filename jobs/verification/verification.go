@@ -21,7 +21,6 @@ func init() {
 type Job struct {
 	Channel   string
 	Grant     string
-	Against   string
 	Discourse struct {
 		URL     string
 		TopicID int `yaml:"topic_id"`

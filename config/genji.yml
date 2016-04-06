@@ -6,7 +6,6 @@ services:
       - load: verification
         channel: test
         grant: Member
-        against: discourse
         discourse:
           url: https://forum.rokkenjima.org
           topic_id: 73
