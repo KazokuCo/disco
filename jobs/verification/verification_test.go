@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func URL(s string) {
+func URL(s string) *url.URL {
 	u, err := url.Parse(s)
 	if err != nil {
 		panic(err)
@@ -16,7 +16,7 @@ func URL(s string) {
 func TestParseLinks(t *testing.T) {
 	base, _ := url.Parse("https://example.com/")
 	text := "Go to https://example.com/memes/ for hot new memes."
-	urls := ParseLinks(text, base)
+	urls, _ := ParseLinks(text, base)
 	if len(urls) != 1 {
 		t.Fail()
 	}

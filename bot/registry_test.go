@@ -6,9 +6,11 @@ import (
 
 type testService struct{ Var bool }
 
-func (*testService) Start() {}
+func (*testService) Login(Store) bool { return false }
+func (*testService) Start(Store)      {}
+func (*testService) Store() Store     { return &struct{}{} }
 
-func testServiceFactory() Service { return testService{Var: true} }
+func testServiceFactory() Service { return &testService{Var: true} }
 
 func TestRegisterService(t *testing.T) {
 	RegisterService("test", testServiceFactory)
@@ -18,9 +20,10 @@ func TestRegisterService(t *testing.T) {
 		t.Error("RegisterService() doesn't register anything!")
 	}
 
-	s, ok := fn().(testService)
+	s, ok := fn().(*testService)
 	if !ok {
 		t.Error("Wrong type returned")
+		return
 	}
 	if !s.Var {
 		t.Error("Service not initialized")
@@ -30,9 +33,10 @@ func TestRegisterService(t *testing.T) {
 func TestGetService(t *testing.T) {
 	RegisterService("test", testServiceFactory)
 
-	s, ok := GetService("test").(testService)
+	s, ok := GetService("test").(*testService)
 	if !ok {
 		t.Error("Wrong type returned")
+		return
 	}
 	if !s.Var {
 		t.Error("Service not initialized")
@@ -41,7 +45,7 @@ func TestGetService(t *testing.T) {
 
 type testJob struct{ Var bool }
 
-func testJobFactory() Job { return testJob{Var: true} }
+func testJobFactory() Job { return &testJob{Var: true} }
 
 func TestRegisterJob(t *testing.T) {
 	RegisterJob("test", testJobFactory)
@@ -51,9 +55,10 @@ func TestRegisterJob(t *testing.T) {
 		t.Error("RegisterJob() doesn't register anything!")
 	}
 
-	s, ok := fn().(testJob)
+	s, ok := fn().(*testJob)
 	if !ok {
 		t.Error("Wrong type returned")
+		return
 	}
 	if !s.Var {
 		t.Error("Job not initialized")
@@ -63,9 +68,10 @@ func TestRegisterJob(t *testing.T) {
 func TestGetJob(t *testing.T) {
 	RegisterJob("test", testJobFactory)
 
-	s, ok := GetJob("test").(testJob)
+	s, ok := GetJob("test").(*testJob)
 	if !ok {
 		t.Error("Wrong type returned")
+		return
 	}
 	if !s.Var {
 		t.Error("Job not initialized")
