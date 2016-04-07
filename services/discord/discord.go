@@ -7,6 +7,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/kazokuco/disco/bot"
 	"os"
+	"strings"
 )
 
 func init() {
@@ -105,6 +106,11 @@ func (srv *Service) Start(store bot.Store) {
 	if err = srv.Session.UpdateStatus(0, srv.Game); err != nil {
 		log.WithError(err).Warn("Discord: Failed to update status")
 	}
+}
+
+func (srv *Service) MentionsMe(m *discordgo.Message) bool {
+	mention := fmt.Sprintf("<@%s>", srv.Session.State.User.ID)
+	return strings.Contains(m.Content, mention)
 }
 
 func (srv *Service) Reply(m *discordgo.Message, text string) {
