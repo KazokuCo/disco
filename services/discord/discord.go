@@ -18,6 +18,7 @@ type Job interface {
 }
 
 type Service struct {
+	Game string
 	Jobs []bot.JobRef
 
 	Session *discordgo.Session `yaml:"-"`
@@ -97,6 +98,10 @@ func (srv *Service) Start(store bot.Store) {
 	}
 
 	err = srv.Session.Open()
+
+	if err = srv.Session.UpdateStatus(0, srv.Game); err != nil {
+		log.WithError(err).Warn("Discord: Failed to update status")
+	}
 }
 
 func (srv *Service) Reply(m *discordgo.Message, text string) {
