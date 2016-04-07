@@ -97,7 +97,10 @@ func (srv *Service) Start(store bot.Store) {
 		job.DiscordInit(srv)
 	}
 
-	err = srv.Session.Open()
+	if err = srv.Session.Open(); err != nil {
+		log.WithError(err).Fatal("Discord: Failed to open connection!")
+		return
+	}
 
 	if err = srv.Session.UpdateStatus(0, srv.Game); err != nil {
 		log.WithError(err).Warn("Discord: Failed to update status")
