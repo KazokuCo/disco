@@ -26,7 +26,8 @@ type Service struct {
 
 type Store struct {
 	Auth struct {
-		Token string
+		Token    string // Bot user token, for user auth
+		ClientID string // App client ID, for generating login URLs
 	}
 }
 

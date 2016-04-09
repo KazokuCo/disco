@@ -58,5 +58,28 @@ func (srv *Service) Login(store bot.Store) bool {
 		return false
 	}
 
+	// Ask for a client ID
+	clientID := os.Getenv("DISCORD_CLIENT_ID")
+	if clientID == "" {
+		if st.Auth.ClientID != "" {
+			fmt.Printf("Press ENTER to keep using: %s\n", st.Auth.ClientID)
+		}
+
+		fmt.Printf("Client ID: ")
+		if !s.Scan() {
+			return false
+		}
+		text := s.Text()
+		if text != "" {
+			clientID = text
+			st.Auth.ClientID = text
+		}
+	}
+
+	// Use it to generate an authorization link
+	link := fmt.Sprintf("https://discordapp.com/oauth2/authorize?&client_id=%s&scope=bot&permissions=0", clientID)
+	fmt.Printf("Use the following link to add the bot to a server:\n")
+	fmt.Printf("    %s\n", link)
+
 	return true
 }
