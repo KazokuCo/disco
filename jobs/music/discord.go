@@ -2,13 +2,13 @@ package music
 
 import (
 	log "github.com/Sirupsen/logrus"
-	_ "github.com/bwmarrin/dgvoice"
+	// _ "github.com/bwmarrin/dgvoice"
 	"github.com/bwmarrin/discordgo"
 	"github.com/kazokuco/disco/services/discord"
 )
 
 type Discord struct {
-	Voice *discordgo.VoiceConnection
+	// Voice *discordgo.VoiceConnection
 }
 
 func (j *Job) DiscordInit(srv *discord.Service) {
