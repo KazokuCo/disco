@@ -85,11 +85,6 @@ func (srv *Service) Start(store bot.Store) {
 		job.DiscordInit(srv)
 	}
 
-	if err = srv.Session.Open(); err != nil {
-		log.WithError(err).Fatal("Discord: Failed to open connection!")
-		return
-	}
-
 	srv.Session.AddHandler(func(s *discordgo.Session, event *discordgo.Ready) {
 		log.WithFields(log.Fields{
 			"ver":  event.Version,
@@ -110,6 +105,11 @@ func (srv *Service) Start(store bot.Store) {
 			"retry":  event.RetryAfter,
 		}).Warn("Discord: Rate limited!")
 	})
+
+	if err = srv.Session.Open(); err != nil {
+		log.WithError(err).Fatal("Discord: Failed to open connection!")
+		return
+	}
 }
 
 func (srv *Service) MentionsMe(m *discordgo.Message) bool {
