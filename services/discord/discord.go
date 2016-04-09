@@ -108,7 +108,7 @@ func (srv *Service) Start(store bot.Store) {
 			"bucket": event.Bucket,
 			"msg":    event.Message,
 			"retry":  event.RetryAfter,
-		}).Warn("Rate limited!")
+		}).Warn("Discord: Rate limited!")
 	})
 }
 
