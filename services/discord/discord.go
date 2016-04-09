@@ -27,9 +27,7 @@ type Service struct {
 
 type Store struct {
 	Auth struct {
-		Username string
-		Password string
-		Token    string
+		Token string
 	}
 }
 
@@ -41,25 +39,17 @@ func (srv *Service) Login(store bot.Store) bool {
 	st := store.(*Store)
 	s := bufio.NewScanner(os.Stdin)
 
-	print("Username: ")
+	print("Token: ")
 	if !s.Scan() {
 		return false
 	}
-	st.Auth.Username = s.Text()
+	st.Auth.Token = s.Text()
 
-	print("Password: ")
-	if !s.Scan() {
-		return false
-	}
-	st.Auth.Password = s.Text()
-
-	session, err := discordgo.New(st.Auth.Username, st.Auth.Password)
+	_, err := discordgo.New(st.Auth.Token)
 	if err != nil {
 		log.WithError(err).Error("Couldn't sign into Discord")
 		return false
 	}
-
-	st.Auth.Token = session.Token
 
 	return true
 }
@@ -71,23 +61,20 @@ func (srv *Service) Store() bot.Store {
 func (srv *Service) Start(store bot.Store) {
 	st := store.(*Store)
 
-	username := st.Auth.Username
-	password := st.Auth.Password
-	if username == "" {
-		username = os.Getenv("DISCORD_USERNAME")
-		password = os.Getenv("DISCORD_PASSWORD")
+	token := st.Auth.Token
+	if token == "" {
+		token = os.Getenv("DISCORD_TOKEN")
 	}
+	if token == "" {
+		log.Fatal("No Discord token given!")
+	}
+	log.Info("Discord: Starting...")
 
-	log.WithField("username", username).Info("Discord: Starting...")
-
-	// Try to connect using an auth token first, otherwise fall back to username + password; in
-	// case the token has expired and been re-issued, always store the latest one
-	session, err := discordgo.New(username, password, st.Auth.Token)
+	session, err := discordgo.New(st.Auth.Token)
 	if err != nil {
 		log.WithError(err).Fatal("Couldn't connect to Discord")
 	}
 	srv.Session = session
-	st.Auth.Token = srv.Session.Token
 
 	for i := range srv.Jobs {
 		ref := srv.Jobs[i]
