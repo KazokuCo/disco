@@ -20,7 +20,7 @@ func New() *Job {
 func (j *Job) DiscordInit(srv *discord.Service) {
 	session := srv.Session
 	session.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
-		channel, err := session.State.Channel(m.ChannelID)
+		channel, err := session.Channel(m.ChannelID)
 		if err != nil {
 			log.WithError(err).WithFields(log.Fields{
 				"id": m.ChannelID,
