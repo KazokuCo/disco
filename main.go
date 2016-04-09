@@ -48,6 +48,12 @@ func main() {
 			Usage:     "Logs into the specified service",
 			Action:    actionLogin,
 		},
+		cli.Command{
+			Name:      "avatar",
+			ArgsUsage: "bot.yml service filename",
+			Usage:     "Updates the bot's avatar for a service",
+			Action:    actionAvatar,
+		},
 	}
 	app.Run(os.Args)
 }

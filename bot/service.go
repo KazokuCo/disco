@@ -16,6 +16,9 @@ type Service interface {
 	// Interactively authorizes the bot with the remote service.
 	// Return whether changes to the bot's brain should be persisted.
 	Login(store Store) bool
+
+	// Updates the bot's avatar. This will probably be removed.
+	UpdateAvatar(store Store, filename string)
 }
 
 type ServiceRef struct {
