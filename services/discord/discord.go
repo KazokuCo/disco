@@ -95,6 +95,10 @@ func (srv *Service) Start(store bot.Store) {
 			"ver":  event.Version,
 			"beat": event.HeartbeatInterval,
 		}).Info("Discord: Ready!")
+
+		if err = srv.Session.UpdateStatus(0, srv.Game); err != nil {
+			log.WithError(err).Warn("Discord: Failed to update status")
+		}
 	})
 	srv.Session.AddHandler(func(s *discordgo.Session, event *discordgo.Disconnect) {
 		log.Warn("Discord: Disconnected!")
@@ -106,10 +110,6 @@ func (srv *Service) Start(store bot.Store) {
 			"retry":  event.RetryAfter,
 		}).Warn("Rate limited!")
 	})
-
-	if err = srv.Session.UpdateStatus(0, srv.Game); err != nil {
-		log.WithError(err).Warn("Discord: Failed to update status")
-	}
 }
 
 func (srv *Service) MentionsMe(m *discordgo.Message) bool {
