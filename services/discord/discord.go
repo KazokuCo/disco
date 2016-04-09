@@ -90,6 +90,23 @@ func (srv *Service) Start(store bot.Store) {
 		return
 	}
 
+	srv.Session.AddHandler(func(s *discordgo.Session, event *discordgo.Ready) {
+		log.WithFields(log.Fields{
+			"ver":  event.Version,
+			"beat": event.HeartbeatInterval,
+		}).Info("Discord: Ready!")
+	})
+	srv.Session.AddHandler(func(s *discordgo.Session, event *discordgo.Disconnect) {
+		log.Warn("Discord: Disconnected!")
+	})
+	srv.Session.AddHandler(func(s *discordgo.Session, event *discordgo.RateLimit) {
+		log.WithFields(log.Fields{
+			"bucket": event.Bucket,
+			"msg":    event.Message,
+			"retry":  event.RetryAfter,
+		}).Warn("Rate limited!")
+	})
+
 	if err = srv.Session.UpdateStatus(0, srv.Game); err != nil {
 		log.WithError(err).Warn("Discord: Failed to update status")
 	}
