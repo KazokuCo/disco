@@ -70,7 +70,7 @@ func (srv *Service) Start(store bot.Store) {
 	}
 	log.Info("Discord: Starting...")
 
-	session, err := discordgo.New(st.Auth.Token)
+	session, err := discordgo.New(token)
 	if err != nil {
 		log.WithError(err).Fatal("Couldn't connect to Discord")
 	}
