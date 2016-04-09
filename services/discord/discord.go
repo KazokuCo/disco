@@ -1,7 +1,6 @@
 package discord
 
 import (
-	"bufio"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/bwmarrin/discordgo"
@@ -33,25 +32,6 @@ type Store struct {
 
 func New() *Service {
 	return &Service{}
-}
-
-func (srv *Service) Login(store bot.Store) bool {
-	st := store.(*Store)
-	s := bufio.NewScanner(os.Stdin)
-
-	print("Token: ")
-	if !s.Scan() {
-		return false
-	}
-	st.Auth.Token = s.Text()
-
-	_, err := discordgo.New(st.Auth.Token)
-	if err != nil {
-		log.WithError(err).Error("Couldn't sign into Discord")
-		return false
-	}
-
-	return true
 }
 
 func (srv *Service) Store() bot.Store {
