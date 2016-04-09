@@ -1,0 +1,7 @@
+[submodule "vendor/github.com/bwmarrin/discordgo"]
+	path = vendor/github.com/bwmarrin/discordgo
+	url = https://github.com/bwmarrin/dgvoice.git
+	branch = develop
+[submodule "vendor/github.com/bwmarrin/dgvoice"]
+	path = vendor/github.com/bwmarrin/dgvoice
+	url = https://github.com/bwmarrin/dgvoice.git

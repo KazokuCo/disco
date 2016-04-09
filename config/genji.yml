@@ -14,5 +14,7 @@ services:
           success: "Your identity has been verified."
           name_not_in_post: "You must mention your name as it appears here in your post."
           error: "An error is preventing me from verifying you. Please try again."
+      - load: music
+        channel: Staff
   # - load: discourse
   #   url: https://forum.rokkenjima.org
