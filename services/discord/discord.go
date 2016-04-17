@@ -36,10 +36,6 @@ func New() *Service {
 	return &Service{}
 }
 
-func (srv *Service) Name() string {
-	return "Discord"
-}
-
 func (srv *Service) Store() bot.Store {
 	return &Store{}
 }

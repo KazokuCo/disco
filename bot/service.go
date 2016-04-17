@@ -7,9 +7,6 @@ import (
 )
 
 type Service interface {
-	// Retuns a human-readable name for the service.
-	Name() string
-
 	// Creates a blank Store. Loading stores is handled for you, but need to be
 	// marshalable into YAML (using: https://gopkg.in/yaml.v2).
 	Store() Store
