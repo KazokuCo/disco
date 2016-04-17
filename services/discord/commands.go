@@ -12,7 +12,7 @@ func (srv *Service) AddCommand(name string, fn CommandHandler) {
 }
 
 func parseCommand(s string) (cmd string, offset int, ok bool) {
-	if s[0] != '/' && s[0] != '!' {
+	if len(s) == 0 || (s[0] != '/' && s[0] != '!') {
 		return "", 0, false
 	}
 

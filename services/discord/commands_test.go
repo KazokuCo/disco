@@ -45,3 +45,17 @@ func TestParseCommandArgs(t *testing.T) {
 		t.Error("offset")
 	}
 }
+
+func TestParseCommandBlank(t *testing.T) {
+	_, _, ok := parseCommand("")
+	if ok {
+		t.Fail()
+	}
+}
+
+func TestParseCommandBlankCommand(t *testing.T) {
+	cmd, _, ok := parseCommand("/")
+	if !ok || cmd != "" {
+		t.Fail()
+	}
+}
