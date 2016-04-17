@@ -46,6 +46,13 @@ func TestParseCurrencyConvert(t *testing.T) {
 	}
 }
 
+func TestParseCurrencyConvertPrefix(t *testing.T) {
+	val, from, to, ok := ParseCurrencyString("EUR 10 in USD")
+	if !ok || val != 10 || from != "EUR" || to != "USD" {
+		t.Error(ok, val, from, to)
+	}
+}
+
 func TestConvertCurrencyBaseToBase(t *testing.T) {
 	rates := CurrencyRates{Base: "EUR", Rates: map[string]float64{"USD": 2}}
 	v, err := rates.Convert(10, "EUR", "EUR")

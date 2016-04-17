@@ -17,7 +17,7 @@ var (
 	currencyNamePattern string         = `[a-zA-Z$€£₤₽¥円]*`
 	currencyRegex       *regexp.Regexp = regexp.MustCompile(`(?i)` +
 		`(` + currencyNamePattern + `) *([\d\.\,]+) *(` + currencyNamePattern + `)` +
-		`(?: *(?:in|to|as) *` +
+		`(?: *(in|to|as)? *` +
 		`(` + currencyNamePattern + `)` +
 		`)?`)
 	currencyAliases map[string]string = map[string]string{
@@ -83,14 +83,21 @@ func ParseCurrency(m []string) (val float64, from, to string, ok bool) {
 		return 0, "", "", false
 	}
 
-	// Prefer suffix to prefix
-	if m[3] != "" {
-		from = m[3]
-	} else if m[1] != "" {
-		from = m[1]
+	// Expressions like `$10 in EUR` get misparsed (in=suffix)
+	prefix := m[1]
+	suffix := m[3]
+	if suffix == "in" || suffix == "to" || suffix == "as" {
+		suffix = ""
 	}
 
-	to = m[4]
+	// Prefer suffix to prefix
+	if suffix != "" {
+		from = suffix
+	} else if prefix != "" {
+		from = prefix
+	}
+
+	to = m[5]
 
 	// A value is meaningless without a unit
 	if val != 0 && from == "" {
