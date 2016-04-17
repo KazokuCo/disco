@@ -16,5 +16,8 @@ services:
           error: "An error is preventing me from verifying you. Please try again."
       - load: music
         channel: Staff
+      - load: conversion
+        lines:
+          currency: "Last I checked, %s was about %s."
   # - load: discourse
   #   url: https://forum.rokkenjima.org
