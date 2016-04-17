@@ -104,7 +104,13 @@ func TestConvertCurrencyFromAndToUnknown(t *testing.T) {
 }
 
 func TestDealiasCurrency(t *testing.T) {
-	if DealiasCurrency("$") != "USD" {
+	if DealiasCurrency("yen") != "JPY" {
+		t.Fail()
+	}
+}
+
+func TestDealiasCurrencyCaseInsensitive(t *testing.T) {
+	if DealiasCurrency("YEN") != "JPY" {
 		t.Fail()
 	}
 }

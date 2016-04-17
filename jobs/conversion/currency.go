@@ -22,21 +22,21 @@ var (
 		`)?`)
 	currencyAliases map[string]string = map[string]string{
 		"$":    "USD",
-		"A$":   "AUD",
-		"AU$":  "AUD",
-		"AUS$": "AUD",
-		"C$":   "CAD",
-		"CA$":  "CAD",
-		"Can$": "CAD",
-		"HK$":  "HKD",
-		"NZ$":  "NZD",
-		"S$":   "SGD",
-		"US$":  "USD",
-		"R$":   "BRL",
+		"a$":   "AUD",
+		"au$":  "AUD",
+		"aus$": "AUD",
+		"c$":   "CAD",
+		"ca$":  "CAD",
+		"can$": "CAD",
+		"hk$":  "HKD",
+		"nz$":  "NZD",
+		"s$":   "SGD",
+		"us$":  "USD",
+		"r$":   "BRL",
 		"€":    "EUR",
 		"kr":   "SEK",
-		"Dkr":  "DKK",
-		"Nkr":  "NOK",
+		"dkr":  "DKK",
+		"nkr":  "NOK",
 		"£":    "GBP",
 		"₤":    "GBP",
 		"₽":    "RUB",
@@ -100,7 +100,7 @@ func ParseCurrency(m []string) (val float64, from, to string, ok bool) {
 }
 
 func DealiasCurrency(c string) string {
-	if c2, ok := currencyAliases[c]; ok {
+	if c2, ok := currencyAliases[strings.ToLower(c)]; ok {
 		return c2
 	}
 	return c
