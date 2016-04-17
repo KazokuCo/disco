@@ -3,6 +3,7 @@ package main
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
+	"github.com/kazokuco/disco/util"
 	"os"
 	"os/signal"
 )
@@ -14,16 +15,16 @@ func actionRun(c *cli.Context) {
 		log.Fatal("No bot specified!")
 	}
 	filename := args[0]
-	brainFilename := BrainFilenameForBotFilename(filename)
+	brainFilename := util.BrainFilenameForBotFilename(filename)
 
 	// Load the bot configuration
-	b, err := LoadBotFromFile(filename)
+	b, err := util.LoadBotFromFile(filename)
 	if err != nil {
 		log.WithError(err).Fatal("Couldn't load bot")
 	}
 
 	// Load the bot's brain
-	brain, err := LoadBrainFromFile(brainFilename)
+	brain, err := util.LoadBrainFromFile(brainFilename)
 	if err != nil {
 		log.WithError(err).Fatal("Couldn't load brain")
 	}
@@ -47,7 +48,7 @@ func actionRun(c *cli.Context) {
 	log.Info("Shutting down")
 
 	// Dump the bot's brain to a file
-	if err = StoreBrainToFile(&brain, brainFilename); err != nil {
+	if err = util.StoreBrainToFile(&brain, brainFilename); err != nil {
 		log.WithError(err).Fatal("Couldn't store brain")
 	}
 }

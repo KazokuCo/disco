@@ -3,6 +3,7 @@ package main
 import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
+	"github.com/kazokuco/disco/bot"
 	_ "github.com/kazokuco/disco/jobs"
 	_ "github.com/kazokuco/disco/services"
 	"os"
@@ -42,18 +43,10 @@ func main() {
 			Usage:     "Runs a bot",
 			Action:    actionRun,
 		},
-		cli.Command{
-			Name:      "login",
-			ArgsUsage: "bot.yml service",
-			Usage:     "Logs into the specified service",
-			Action:    actionLogin,
-		},
-		cli.Command{
-			Name:      "avatar",
-			ArgsUsage: "bot.yml service filename",
-			Usage:     "Updates the bot's avatar for a service",
-			Action:    actionAvatar,
-		},
+	}
+	for _, fn := range bot.ServiceRegistry {
+		srv := fn()
+		app.Commands = append(app.Commands, srv.Command())
 	}
 	app.Run(os.Args)
 }

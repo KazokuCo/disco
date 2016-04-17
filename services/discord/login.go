@@ -5,11 +5,30 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/bwmarrin/discordgo"
-	"github.com/kazokuco/disco/bot"
+	"github.com/codegangsta/cli"
+	"github.com/kazokuco/disco/util"
 	"os"
 )
 
-func (srv *Service) Login(store bot.Store) bool {
+func (srv *Service) Login(c *cli.Context) {
+	args := c.Args()
+	if len(args) != 1 {
+		log.Fatal("No bot specified!")
+	}
+
+	filename := args[0]
+	brainFilename := util.BrainFilenameForBotFilename(filename)
+
+	brain, err := util.LoadBrainFromFile(brainFilename)
+	if err != nil {
+		log.WithError(err).Fatal("Couldn't load brain")
+	}
+
+	store, err := brain.Get("service", "discord")
+	if err != nil {
+		log.WithError(err).Fatal("Couldn't get store")
+	}
+
 	st := store.(*Store)
 	s := bufio.NewScanner(os.Stdin)
 
@@ -22,7 +41,7 @@ func (srv *Service) Login(store bot.Store) bool {
 
 		fmt.Printf("Token: ")
 		if !s.Scan() {
-			return false
+			os.Exit(0)
 		}
 		text := s.Text()
 		if text != "" {
@@ -34,8 +53,7 @@ func (srv *Service) Login(store bot.Store) bool {
 	// Make a Discord session using it; no auth is checked here
 	session, err := discordgo.New(token)
 	if err != nil {
-		log.WithError(err).Error("Couldn't connect to Discord")
-		return false
+		log.WithError(err).Fatal("Couldn't connect to Discord")
 	}
 
 	// Verify that the token can actually connect
@@ -47,15 +65,13 @@ func (srv *Service) Login(store bot.Store) bool {
 		resultCh <- false
 	})
 	if err = session.Open(); err != nil {
-		log.WithError(err).Error("Couldn't open a connection")
-		return false
+		log.WithError(err).Fatal("Couldn't open a connection")
 	}
 
 	// If we can't authorize, abort
 	result := <-resultCh
 	if !result {
-		log.Error("Couldn't sign into Discord")
-		return false
+		log.Fatal("Couldn't sign into Discord")
 	}
 
 	// Ask for a client ID
@@ -67,7 +83,7 @@ func (srv *Service) Login(store bot.Store) bool {
 
 		fmt.Printf("Client ID: ")
 		if !s.Scan() {
-			return false
+			os.Exit(0)
 		}
 		text := s.Text()
 		if text != "" {
@@ -81,5 +97,8 @@ func (srv *Service) Login(store bot.Store) bool {
 	fmt.Printf("Use the following link to add the bot to a server:\n")
 	fmt.Printf("    %s\n", link)
 
-	return true
+	// Dump the bot's brain to a file
+	if err = util.StoreBrainToFile(&brain, brainFilename); err != nil {
+		log.WithError(err).Fatal("Couldn't store brain")
+	}
 }

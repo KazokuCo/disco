@@ -4,6 +4,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/bwmarrin/discordgo"
+	"github.com/codegangsta/cli"
 	"github.com/kazokuco/disco/bot"
 	"os"
 	"strings"
@@ -33,6 +34,10 @@ type Store struct {
 
 func New() *Service {
 	return &Service{}
+}
+
+func (srv *Service) Name() string {
+	return "Discord"
 }
 
 func (srv *Service) Store() bot.Store {
@@ -90,6 +95,20 @@ func (srv *Service) Start(store bot.Store) {
 	if err = srv.Session.Open(); err != nil {
 		log.WithError(err).Fatal("Discord: Failed to open connection!")
 		return
+	}
+}
+
+func (srv *Service) Command() cli.Command {
+	return cli.Command{
+		Name:  "discord",
+		Usage: "Discord-specific commands",
+		Subcommands: []cli.Command{
+			cli.Command{
+				Name:      "login",
+				ArgsUsage: "bot.yml",
+				Action:    func(c *cli.Context) { srv.Login(c) },
+			},
+		},
 	}
 }
 

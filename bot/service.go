@@ -3,9 +3,13 @@ package bot
 import (
 	"errors"
 	"fmt"
+	"github.com/codegangsta/cli"
 )
 
 type Service interface {
+	// Retuns a human-readable name for the service.
+	Name() string
+
 	// Creates a blank Store. Loading stores is handled for you, but need to be
 	// marshalable into YAML (using: https://gopkg.in/yaml.v2).
 	Store() Store
@@ -15,10 +19,7 @@ type Service interface {
 
 	// Interactively authorizes the bot with the remote service.
 	// Return whether changes to the bot's brain should be persisted.
-	Login(store Store) bool
-
-	// Updates the bot's avatar. This will probably be removed.
-	UpdateAvatar(store Store, filename string)
+	Command() cli.Command
 }
 
 type ServiceRef struct {

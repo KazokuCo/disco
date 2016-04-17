@@ -5,13 +5,11 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/bwmarrin/discordgo"
-	"github.com/kazokuco/disco/bot"
 	"io/ioutil"
 	"os"
 )
 
-func (srv *Service) UpdateAvatar(store bot.Store, filename string) {
-	st := store.(*Store)
+func (srv *Service) UpdateAvatar(st *Store, filename string) {
 	token := st.Auth.Token
 	if token == "" {
 		token = os.Getenv("DISCORD_TOKEN")
