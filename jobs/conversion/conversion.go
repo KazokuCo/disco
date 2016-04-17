@@ -13,7 +13,8 @@ func init() {
 
 type Job struct {
 	Lines struct {
-		Currency string
+		Currency      string
+		CurrencyMulti string `yaml:"currency_multi"`
 	}
 }
 

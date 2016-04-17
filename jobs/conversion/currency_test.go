@@ -45,3 +45,60 @@ func TestParseCurrencyConvert(t *testing.T) {
 		t.Error(ok, val, from, to)
 	}
 }
+
+func TestConvertCurrencyBaseToBase(t *testing.T) {
+	rates := CurrencyRates{Base: "EUR", Rates: map[string]float64{"USD": 2}}
+	v, err := rates.Convert(10, "EUR", "EUR")
+	if err != nil {
+		t.Error(err)
+	}
+	if v != 10 {
+		t.Fail()
+	}
+}
+
+func TestConvertCurrencyBaseToOther(t *testing.T) {
+	rates := CurrencyRates{Base: "EUR", Rates: map[string]float64{"USD": 2}}
+	v, err := rates.Convert(10, "EUR", "USD")
+	if err != nil {
+		t.Error(err)
+	}
+	if v != 20 {
+		t.Fail()
+	}
+}
+
+func TestConvertCurrencyOtherToBase(t *testing.T) {
+	rates := CurrencyRates{Base: "EUR", Rates: map[string]float64{"USD": 2}}
+	v, err := rates.Convert(10, "USD", "EUR")
+	if err != nil {
+		t.Error(err)
+	}
+	if v != 5 {
+		t.Fail()
+	}
+}
+
+func TestConvertCurrencyFromUnknown(t *testing.T) {
+	rates := CurrencyRates{Base: "EUR", Rates: map[string]float64{"USD": 2}}
+	_, err := rates.Convert(10, "butts", "EUR")
+	if err == nil {
+		t.Fail()
+	}
+}
+
+func TestConvertCurrencyToUnknown(t *testing.T) {
+	rates := CurrencyRates{Base: "EUR", Rates: map[string]float64{"USD": 2}}
+	_, err := rates.Convert(10, "EUR", "butts")
+	if err == nil {
+		t.Fail()
+	}
+}
+
+func TestConvertCurrencyFromAndToUnknown(t *testing.T) {
+	rates := CurrencyRates{Base: "EUR", Rates: map[string]float64{"USD": 2}}
+	_, err := rates.Convert(10, "butts", "florps")
+	if err == nil {
+		t.Fail()
+	}
+}

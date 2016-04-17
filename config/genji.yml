@@ -19,5 +19,6 @@ services:
       - load: conversion
         lines:
           currency: "Last I checked, %s was about %s."
+          currency_multi: "Last I checked, %s was about $%s, €%s, £%s or ¥%s."
   # - load: discourse
   #   url: https://forum.rokkenjima.org

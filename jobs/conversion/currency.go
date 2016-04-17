@@ -117,5 +117,17 @@ func (j *Job) HandleCurrency(s *discordgo.Session, msg *discordgo.Message, match
 		toText := fmt.Sprintf("%.2f %s", val2, to)
 		text := fmt.Sprintf(j.Lines.Currency, fromText, toText)
 		s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("<@%s> %s", msg.Author.ID, text))
+	} else {
+		usd, err := rates.Convert(val, from, "USD")
+		eur, _ := rates.Convert(val, from, "EUR")
+		gbp, _ := rates.Convert(val, from, "GBP")
+		jpy, _ := rates.Convert(val, from, "JPY")
+		if err != nil {
+			log.WithError(err).Error("Conversion: Couldn't convert currency")
+			return
+		}
+		fromText := fmt.Sprintf("%.2f %s", val, from)
+		text := fmt.Sprintf(j.Lines.CurrencyMulti, fromText, fmt.Sprintf("%.2f", usd), fmt.Sprintf("%.2f", eur), fmt.Sprintf("%.2f", gbp), fmt.Sprintf("%.2f", jpy))
+		s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("<@%s> %s", msg.Author.ID, text))
 	}
 }
