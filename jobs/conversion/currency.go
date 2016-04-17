@@ -20,6 +20,27 @@ var (
 		`(?: *(?:in|to|as) *` +
 		`(` + currencyNamePattern + `)` +
 		`)?`)
+	currencyAliases map[string]string = map[string]string{
+		"$":    "USD",
+		"A$":   "AUD",
+		"C$":   "CAD",
+		"Can$": "CAD",
+		"HK$":  "HKD",
+		"NZ$":  "NZD",
+		"S$":   "SGD",
+		"US$":  "USD",
+		"R$":   "BRL",
+		"€":    "EUR",
+		"kr":   "SEK",
+		"Dkr":  "DKK",
+		"Nkr":  "NOK",
+		"£":    "GBP",
+		"₤":    "GBP",
+		"₽":    "RUB",
+		"¥":    "JPY",
+		"円":    "JPY",
+		"yen":  "JPY",
+	}
 )
 
 type CurrencyRates struct {
@@ -75,6 +96,13 @@ func ParseCurrency(m []string) (val float64, from, to string, ok bool) {
 	return val, from, to, true
 }
 
+func DealiasCurrency(c string) string {
+	if c2, ok := currencyAliases[c]; ok {
+		return c2
+	}
+	return c
+}
+
 func FetchRates() (rates CurrencyRates, err error) {
 	res, err := http.Get("https://api.fixer.io/latest")
 	if err != nil {
@@ -99,6 +127,8 @@ func (j *Job) HandleCurrency(s *discordgo.Session, msg *discordgo.Message, match
 	if !ok {
 		return
 	}
+	from = DealiasCurrency(from)
+	to = DealiasCurrency(to)
 	log.WithFields(log.Fields{"val": val, "from": from, "to": to}).Info("Looks like currency")
 
 	rates, err := FetchRates()

@@ -102,3 +102,15 @@ func TestConvertCurrencyFromAndToUnknown(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestDealiasCurrency(t *testing.T) {
+	if DealiasCurrency("$") != "USD" {
+		t.Fail()
+	}
+}
+
+func TestDealiasCurrencyUnknown(t *testing.T) {
+	if DealiasCurrency("florps") != "florps" {
+		t.Fail()
+	}
+}
