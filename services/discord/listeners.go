@@ -13,6 +13,11 @@ type Listener struct {
 }
 
 func (l Listener) Match(s string) [][]string {
+	// Don't interfere with custom commands; do react to /me "commands"
+	if (s[0] == '/' || s[0] == '!') && s[:3] != "/me" {
+		return nil
+	}
+
 	return l.Regex.FindAllStringSubmatch(s, -1)
 }
 

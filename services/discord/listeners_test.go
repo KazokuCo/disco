@@ -13,3 +13,15 @@ func TestListenerMatch(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestListenerMatchCustomCommand(t *testing.T) {
+	if (Listener{Regex: regexp.MustCompile(`\$\d+`)}).Match("/cmd $10") != nil {
+		t.Fail()
+	}
+}
+
+func TestListenerMatchSlashMe(t *testing.T) {
+	if (Listener{Regex: regexp.MustCompile(`\$\d+`)}).Match("/me $10") == nil {
+		t.Fail()
+	}
+}
