@@ -7,7 +7,7 @@ import (
 
 func TestListenerMatch(t *testing.T) {
 	m := Listener{
-		Regex: regexp.MustCompile(`\$([\d]+)\.([\d]+)`),
+		Regexp: regexp.MustCompile(`\$([\d]+)\.([\d]+)`),
 	}.Match("$10.50")
 	if len(m) != 1 || len(m[0]) != 3 {
 		t.Fail()
@@ -15,13 +15,13 @@ func TestListenerMatch(t *testing.T) {
 }
 
 func TestListenerMatchCustomCommand(t *testing.T) {
-	if (Listener{Regex: regexp.MustCompile(`\$\d+`)}).Match("/cmd $10") != nil {
+	if (Listener{Regexp: regexp.MustCompile(`\$\d+`)}).Match("/cmd $10") != nil {
 		t.Fail()
 	}
 }
 
 func TestListenerMatchSlashMe(t *testing.T) {
-	if (Listener{Regex: regexp.MustCompile(`\$\d+`)}).Match("/me $10") == nil {
+	if (Listener{Regexp: regexp.MustCompile(`\$\d+`)}).Match("/me $10") == nil {
 		t.Fail()
 	}
 }

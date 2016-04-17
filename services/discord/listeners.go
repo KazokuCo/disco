@@ -8,7 +8,7 @@ import (
 type ListenerAction func(s *discordgo.Session, msg *discordgo.Message, matches [][]string)
 
 type Listener struct {
-	Regex  *regexp.Regexp
+	Regexp *regexp.Regexp
 	Action ListenerAction
 }
 
@@ -18,7 +18,7 @@ func (l Listener) Match(s string) [][]string {
 		return nil
 	}
 
-	return l.Regex.FindAllStringSubmatch(s, -1)
+	return l.Regexp.FindAllStringSubmatch(s, -1)
 }
 
 func (srv *Service) AddListener(l Listener) {
