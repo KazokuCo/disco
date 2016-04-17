@@ -74,29 +74,6 @@ func (srv *Service) Login(c *cli.Context) {
 		log.Fatal("Couldn't sign into Discord")
 	}
 
-	// Ask for a client ID
-	clientID := os.Getenv("DISCORD_CLIENT_ID")
-	if clientID == "" {
-		if st.Auth.ClientID != "" {
-			fmt.Printf("Press ENTER to keep using: %s\n", st.Auth.ClientID)
-		}
-
-		fmt.Printf("Client ID: ")
-		if !s.Scan() {
-			os.Exit(0)
-		}
-		text := s.Text()
-		if text != "" {
-			clientID = text
-			st.Auth.ClientID = text
-		}
-	}
-
-	// Use it to generate an authorization link
-	link := fmt.Sprintf("https://discordapp.com/oauth2/authorize?&client_id=%s&scope=bot&permissions=0", clientID)
-	fmt.Printf("Use the following link to add the bot to a server:\n")
-	fmt.Printf("    %s\n", link)
-
 	// Dump the bot's brain to a file
 	if err = util.StoreBrainToFile(&brain, brainFilename); err != nil {
 		log.WithError(err).Fatal("Couldn't store brain")

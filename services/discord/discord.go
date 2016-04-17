@@ -104,6 +104,11 @@ func (srv *Service) Command() cli.Command {
 				ArgsUsage: "bot.yml",
 				Action:    func(c *cli.Context) { srv.Login(c) },
 			},
+			cli.Command{
+				Name:      "auth",
+				ArgsUsage: "bot.yml",
+				Action:    func(c *cli.Context) { srv.Authorize(c) },
+			},
 		},
 	}
 }
