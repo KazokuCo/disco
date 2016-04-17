@@ -23,7 +23,10 @@ var (
 	currencyAliases map[string]string = map[string]string{
 		"$":    "USD",
 		"A$":   "AUD",
+		"AU$":  "AUD",
+		"AUS$": "AUD",
 		"C$":   "CAD",
+		"CA$":  "CAD",
 		"Can$": "CAD",
 		"HK$":  "HKD",
 		"NZ$":  "NZD",
