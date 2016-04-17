@@ -14,6 +14,9 @@ type Service interface {
 	// Starts the service.
 	Start(store Store)
 
+	// Stops the service.
+	Stop(store Store)
+
 	// Interactively authorizes the bot with the remote service.
 	// Return whether changes to the bot's brain should be persisted.
 	Command() cli.Command

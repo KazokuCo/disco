@@ -23,6 +23,8 @@ type Service struct {
 	Session   *discordgo.Session        `yaml:"-"`
 	Commands  map[string]CommandHandler `yaml:"-"`
 	Listeners []Listener                `yaml:"-"`
+
+	removeDCHandler func()
 }
 
 type Store struct {
@@ -77,7 +79,7 @@ func (srv *Service) Start(store bot.Store) {
 			log.WithError(err).Warn("Discord: Failed to update status")
 		}
 	})
-	srv.Session.AddHandler(func(s *discordgo.Session, event *discordgo.Disconnect) {
+	srv.removeDCHandler = srv.Session.AddHandler(func(s *discordgo.Session, event *discordgo.Disconnect) {
 		log.Warn("Discord: Disconnected!")
 	})
 	srv.Session.AddHandler(func(s *discordgo.Session, event *discordgo.RateLimit) {
@@ -96,6 +98,15 @@ func (srv *Service) Start(store bot.Store) {
 	if err = srv.Session.Open(); err != nil {
 		log.WithError(err).Fatal("Discord: Failed to open connection!")
 		return
+	}
+}
+
+func (srv *Service) Stop(store bot.Store) {
+	// Don't print a warning about getting disconnected; we know
+	srv.removeDCHandler()
+
+	if err := srv.Session.Close(); err != nil {
+		log.WithError(err).Error("Discord: Failed to close cleanly")
 	}
 }
 

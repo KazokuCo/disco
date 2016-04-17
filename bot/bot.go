@@ -15,6 +15,7 @@ func (bot *Bot) Run(brain *Brain, stop <-chan interface{}) error {
 			return err
 		}
 		service.Impl.Start(store)
+		defer service.Impl.Stop(store)
 	}
 
 	// Wait for a stop signal

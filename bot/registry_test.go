@@ -8,6 +8,7 @@ import (
 type testService struct{ Var bool }
 
 func (*testService) Start(Store)          {}
+func (*testService) Stop(Store)           {}
 func (*testService) Store() Store         { return &struct{}{} }
 func (*testService) Command() cli.Command { return cli.Command{} }
 
