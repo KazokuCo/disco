@@ -1,13 +1,11 @@
 package discord
 
 import (
-	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/bwmarrin/discordgo"
 	"github.com/codegangsta/cli"
 	"github.com/kazokuco/disco/bot"
 	"os"
-	"strings"
 )
 
 func init() {
@@ -111,13 +109,4 @@ func (srv *Service) Command() cli.Command {
 			},
 		},
 	}
-}
-
-func (srv *Service) MentionsMe(m *discordgo.Message) bool {
-	mention := fmt.Sprintf("<@%s>", srv.Session.State.User.ID)
-	return strings.Contains(m.Content, mention)
-}
-
-func (srv *Service) Reply(m *discordgo.Message, text string) {
-	srv.Session.ChannelMessageSend(m.ChannelID, fmt.Sprintf("<@%s> %s", m.Author.ID, text))
 }
