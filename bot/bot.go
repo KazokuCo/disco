@@ -9,8 +9,7 @@ func New() Bot {
 }
 
 func (bot *Bot) Run(brain *Brain, stop <-chan interface{}) error {
-	for i := range bot.Services {
-		service := bot.Services[i]
+	for _, service := range bot.Services {
 		store, err := brain.Get(TypeService, service.Load)
 		if err != nil {
 			return err
