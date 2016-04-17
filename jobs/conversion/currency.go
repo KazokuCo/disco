@@ -22,27 +22,27 @@ var (
 		`)?`)
 	currencyAliases map[string]string = map[string]string{
 		"$":    "USD",
-		"a$":   "AUD",
-		"au$":  "AUD",
-		"aus$": "AUD",
-		"c$":   "CAD",
-		"ca$":  "CAD",
-		"can$": "CAD",
-		"hk$":  "HKD",
-		"nz$":  "NZD",
-		"s$":   "SGD",
-		"us$":  "USD",
-		"r$":   "BRL",
+		"A$":   "AUD",
+		"AU$":  "AUD",
+		"AUS$": "AUD",
+		"C$":   "CAD",
+		"CA$":  "CAD",
+		"CAN$": "CAD",
+		"HK$":  "HKD",
+		"NZ$":  "NZD",
+		"S$":   "SGD",
+		"US$":  "USD",
+		"R$":   "BRL",
 		"€":    "EUR",
-		"kr":   "SEK",
-		"dkr":  "DKK",
-		"nkr":  "NOK",
+		"KR":   "SEK",
+		"DKR":  "DKK",
+		"NKR":  "NOK",
 		"£":    "GBP",
 		"₤":    "GBP",
 		"₽":    "RUB",
 		"¥":    "JPY",
 		"円":    "JPY",
-		"yen":  "JPY",
+		"YEN":  "JPY",
 	}
 )
 
@@ -106,8 +106,9 @@ func ParseCurrency(m []string) (val float64, from, to string, ok bool) {
 	return val, from, to, true
 }
 
-func DealiasCurrency(c string) string {
-	if c2, ok := currencyAliases[strings.ToLower(c)]; ok {
+func ResolveCurrency(c string) string {
+	c = strings.ToUpper(c)
+	if c2, ok := currencyAliases[c]; ok {
 		return c2
 	}
 	return c
@@ -137,8 +138,8 @@ func (j *Job) HandleCurrency(s *discordgo.Session, msg *discordgo.Message, match
 	if !ok {
 		return
 	}
-	from = DealiasCurrency(from)
-	to = DealiasCurrency(to)
+	from = ResolveCurrency(from)
+	to = ResolveCurrency(to)
 	log.WithFields(log.Fields{"val": val, "from": from, "to": to}).Info("Looks like currency")
 
 	rates, err := FetchRates()

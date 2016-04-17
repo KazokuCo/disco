@@ -110,20 +110,26 @@ func TestConvertCurrencyFromAndToUnknown(t *testing.T) {
 	}
 }
 
-func TestDealiasCurrency(t *testing.T) {
-	if DealiasCurrency("yen") != "JPY" {
+func TestResolveCurrency(t *testing.T) {
+	if ResolveCurrency("yen") != "JPY" {
 		t.Fail()
 	}
 }
 
-func TestDealiasCurrencyCaseInsensitive(t *testing.T) {
-	if DealiasCurrency("YEN") != "JPY" {
+func TestResolveCurrencyCaseInsensitive(t *testing.T) {
+	if ResolveCurrency("YEN") != "JPY" {
 		t.Fail()
 	}
 }
 
-func TestDealiasCurrencyUnknown(t *testing.T) {
-	if DealiasCurrency("florps") != "florps" {
+func TestResolveCurrencyUnaliased(t *testing.T) {
+	if ResolveCurrency("USD") != "USD" {
+		t.Fail()
+	}
+}
+
+func TestResolveCurrencyUnaliasedCaseInsensitive(t *testing.T) {
+	if ResolveCurrency("usd") != "USD" {
 		t.Fail()
 	}
 }
