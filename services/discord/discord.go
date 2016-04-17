@@ -20,7 +20,8 @@ type Service struct {
 	Game string
 	Jobs []bot.JobRef
 
-	Session *discordgo.Session `yaml:"-"`
+	Session  *discordgo.Session        `yaml:"-"`
+	Commands map[string]CommandHandler `yaml:"-"`
 }
 
 type Store struct {
@@ -85,6 +86,9 @@ func (srv *Service) Start(store bot.Store) {
 			"retry":  event.RetryAfter,
 		}).Warn("Discord: Rate limited!")
 	})
+
+	// Handle /commands
+	srv.Session.AddHandler(srv.handleMessageCreateWithCommand)
 
 	if err = srv.Session.Open(); err != nil {
 		log.WithError(err).Fatal("Discord: Failed to open connection!")
