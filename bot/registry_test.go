@@ -1,14 +1,15 @@
 package bot
 
 import (
+	"github.com/codegangsta/cli"
 	"testing"
 )
 
 type testService struct{ Var bool }
 
-func (*testService) Login(Store) bool { return false }
-func (*testService) Start(Store)      {}
-func (*testService) Store() Store     { return &struct{}{} }
+func (*testService) Start(Store)          {}
+func (*testService) Store() Store         { return &struct{}{} }
+func (*testService) Command() cli.Command { return cli.Command{} }
 
 func testServiceFactory() Service { return &testService{Var: true} }
 
