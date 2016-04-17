@@ -20,8 +20,9 @@ type Service struct {
 	Game string
 	Jobs []bot.JobRef
 
-	Session  *discordgo.Session        `yaml:"-"`
-	Commands map[string]CommandHandler `yaml:"-"`
+	Session   *discordgo.Session        `yaml:"-"`
+	Commands  map[string]CommandHandler `yaml:"-"`
+	Listeners []Listener                `yaml:"-"`
 }
 
 type Store struct {
@@ -89,6 +90,8 @@ func (srv *Service) Start(store bot.Store) {
 
 	// Handle /commands
 	srv.Session.AddHandler(srv.handleMessageCreateWithCommand)
+	// Handle non-command triggers
+	srv.Session.AddHandler(srv.handleMessageCreateWithListener)
 
 	if err = srv.Session.Open(); err != nil {
 		log.WithError(err).Fatal("Discord: Failed to open connection!")
