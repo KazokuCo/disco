@@ -77,6 +77,7 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 		}
 
 		if channel.Name != j.Channel {
+			log.WithField("channel", j.Channel).Debug("Verification: Wrong channel")
 			return
 		}
 
@@ -98,6 +99,7 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 		}
 		for i := range urls {
 			u := urls[i]
+			log.WithField("url", u).Debug("Verification: URL found")
 
 			// Ignore links not to topics
 			if !strings.HasPrefix(u.Path, "/t/") {
