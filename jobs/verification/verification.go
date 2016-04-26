@@ -23,13 +23,15 @@ type Job struct {
 	Channel   string
 	Grant     string
 	Discourse struct {
-		RawURL  string   `yaml:"url"`
-		TopicID int      `yaml:"topic_id"`
-		URL     *url.URL `yaml:"-"`
+		RawURL     string   `yaml:"url"`
+		TopicID    int      `yaml:"topic_id"`
+		TrustLevel int      `yaml:"trust_level"`
+		URL        *url.URL `yaml:"-"`
 	}
 	Lines struct {
 		Success       string
 		NameNotInPost string `yaml:"name_not_in_post"`
+		LevelTooLow   string `yaml:"level_too_low"`
 		Error         string
 	}
 }
@@ -135,6 +137,7 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 					Posts []struct {
 						PostNumber int    `json:"post_number"`
 						Cooked     string `json:"cooked"`
+						TrustLevel int    `json:"trust_level"`
 					} `json:"posts"`
 				} `json:"post_stream"`
 			}
@@ -157,8 +160,19 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 					continue
 				}
 
+				// Make sure the correct Discord username is mentioned
 				if !strings.Contains(post.Cooked, m.Author.Username) {
 					srv.Reply(m.Message, j.Lines.NameNotInPost)
+					break
+				}
+
+				// If requested, verify the user's trust level
+				if j.Discourse.TrustLevel > post.TrustLevel {
+					log.WithFields(log.Fields{
+						"have": post.TrustLevel,
+						"need": j.Discourse.TrustLevel,
+					}).Debug("Verification: Trust Level")
+					srv.Reply(m.Message, j.Lines.LevelTooLow)
 					break
 				}
 
