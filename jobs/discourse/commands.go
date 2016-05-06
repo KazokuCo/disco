@@ -4,7 +4,7 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/bwmarrin/discordgo"
-	"net/html"
+	"html"
 	"strings"
 )
 
@@ -20,14 +20,15 @@ func (j *Job) CommandQueryTopics(s *discordgo.Session, msg *discordgo.Message, c
 
 	topicLines := []string{}
 	for _, t := range res.Topics {
-		if !strings.Contains(strings.ToLower(t.Title), q) {
+		title := html.UnescapeString(t.FancyTitle)
+		if !strings.Contains(strings.ToLower(title), q) {
 			continue
 		}
 
 		url := fmt.Sprintf("%s/t/%d", j.URL, t.ID)
-		line := fmt.Sprintf("%s - <%s>", t.Title, url)
+		line := fmt.Sprintf("%s - <%s>", title, url)
 		topicLines = append(topicLines, line)
-		log.WithFields(log.Fields{"title": t.Title, "url": url}).Debug("Found topic")
+		log.WithFields(log.Fields{"title": title, "url": url}).Debug("Found topic")
 	}
 
 	text := strings.Join(topicLines, "\n")
