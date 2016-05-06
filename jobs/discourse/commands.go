@@ -18,12 +18,19 @@ func (j *Job) CommandQueryTopics(s *discordgo.Session, msg *discordgo.Message, c
 		return
 	}
 
+	keywords := strings.Split(arg, " ")
 	topicLines := []string{}
+
+topicLoop:
 	for _, t := range res.Topics {
-		title := html.UnescapeString(t.FancyTitle)
-		if !strings.Contains(strings.ToLower(title), q) {
-			continue
+		lowTitle := strings.ToLower(t.Title)
+		for _, keyword := range keywords {
+			if !strings.Contains(lowTitle, keyword) {
+				continue topicLoop
+			}
 		}
+
+		title := html.UnescapeString(t.FancyTitle)
 
 		url := fmt.Sprintf("%s/t/%d", j.URL, t.ID)
 		line := fmt.Sprintf("%s - <%s>", title, url)
