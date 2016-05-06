@@ -35,7 +35,9 @@ type Store struct {
 }
 
 func New() *Service {
-	return &Service{}
+	return &Service{
+		Commands: make(map[string]CommandHandler),
+	}
 }
 
 func (srv *Service) Store() bot.Store {

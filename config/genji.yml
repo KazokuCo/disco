@@ -16,6 +16,8 @@ services:
           name_not_in_post: "You must mention your name as it appears here in your post."
           level_too_low: "It appears as though you have not yet reached Member status. Please participate on the forum for a few days and try again. Your current level is listed on your profile page."
           error: "An error is preventing me from verifying you. Please try again."
+      - load: discourse
+        url: https://forum.kazamatsuri.org
       - load: music
         channel: Staff
       - load: conversion
