@@ -18,13 +18,13 @@ func (j *Job) CommandQueryTopics(s *discordgo.Session, msg *discordgo.Message, c
 	}
 
 	for _, t := range res.Topics {
-		if !strings.Contains(strings.ToLower(t.FancyTitle), q) {
+		if !strings.Contains(strings.ToLower(t.Title), q) {
 			continue
 		}
 
 		url := fmt.Sprintf("%s/t/%d", j.URL, t.ID)
-		line := fmt.Sprintf("%s - <%s>", t.FancyTitle, url)
+		line := fmt.Sprintf("%s - <%s>", t.Title, url)
 		s.ChannelMessageSend(msg.ChannelID, line)
-		log.WithFields(log.Fields{"title": t.FancyTitle, "url": url}).Debug("Found topic")
+		log.WithFields(log.Fields{"title": t.Title, "url": url}).Debug("Found topic")
 	}
 }
