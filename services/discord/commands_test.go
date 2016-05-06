@@ -4,58 +4,44 @@ import (
 	"testing"
 )
 
-func TestParseCommandSingle(t *testing.T) {
-	s := "/command"
-	cmd, offset, ok := parseCommand(s)
-	if !ok {
-		t.FailNow()
-	}
-	if cmd != "command" {
-		t.Error("cmd")
-	}
-	if s[offset:] != "" {
-		t.Error("offset")
-	}
-}
-
-func TestParseCommandTrailingSpace(t *testing.T) {
-	s := "/command "
-	cmd, offset, ok := parseCommand(s)
-	if !ok {
-		t.FailNow()
-	}
-	if cmd != "command" {
-		t.Error("cmd")
-	}
-	if s[offset:] != "" {
-		t.Error("offset")
-	}
-}
-
-func TestParseCommandArgs(t *testing.T) {
-	s := "/command something"
-	cmd, offset, ok := parseCommand(s)
-	if !ok {
-		t.FailNow()
-	}
-	if cmd != "command" {
-		t.Error("cmd")
-	}
-	if s[offset:] != "something" {
-		t.Error("offset")
-	}
-}
-
 func TestParseCommandBlank(t *testing.T) {
-	_, _, ok := parseCommand("")
-	if ok {
+	cmd, arg, q := ParseCommand("")
+	if cmd != "" || arg != "" || q {
 		t.Fail()
 	}
 }
 
-func TestParseCommandBlankCommand(t *testing.T) {
-	cmd, _, ok := parseCommand("/")
-	if !ok || cmd != "" {
+func TestParseCommandNotACommand(t *testing.T) {
+	cmd, arg, q := ParseCommand("cmd arg")
+	if cmd != "" || arg != "" || q {
+		t.Fail()
+	}
+}
+
+func TestParseCommandSingle(t *testing.T) {
+	cmd, arg, q := ParseCommand("!cmd")
+	if cmd != "cmd" || arg != "" || q {
+		t.Fail()
+	}
+}
+
+func TestParseCommandArg(t *testing.T) {
+	cmd, arg, q := ParseCommand("!cmd arg")
+	if cmd != "cmd" || arg != "arg" || q {
+		t.Fail()
+	}
+}
+
+func TestParseCommandRedundantSpaces(t *testing.T) {
+	cmd, arg, q := ParseCommand("!cmd   arg   ")
+	if cmd != "cmd" || arg != "arg" || q {
+		t.Fail()
+	}
+}
+
+func TestParseCommandQuery(t *testing.T) {
+	cmd, arg, q := ParseCommand("?cmd query")
+	if cmd != "cmd" || arg != "query" || !q {
 		t.Fail()
 	}
 }
