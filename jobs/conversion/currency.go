@@ -169,6 +169,6 @@ func (j *Job) HandleCurrency(s *discordgo.Session, msg *discordgo.Message, match
 		}
 		fromText := fmt.Sprintf("%.2f %s", val, from)
 		text := fmt.Sprintf(j.Lines.CurrencyMulti, fromText, fmt.Sprintf("%.2f", usd), fmt.Sprintf("%.2f", eur), fmt.Sprintf("%.2f", gbp), fmt.Sprintf("%.2f", jpy))
-		s.ChannelMessageSend(msg.ChannelID, fmt.Sprintf("<@%s> %s", msg.Author.ID, text))
+		s.ChannelMessageSend(msg.ChannelID, text)
 	}
 }
