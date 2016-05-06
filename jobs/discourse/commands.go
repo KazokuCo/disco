@@ -17,7 +17,6 @@ func (j *Job) CommandQueryTopics(s *discordgo.Session, msg *discordgo.Message, c
 		return
 	}
 
-	topicLines := []string{}
 	for _, t := range res.Topics {
 		if !strings.Contains(strings.ToLower(t.FancyTitle), q) {
 			continue
@@ -25,10 +24,7 @@ func (j *Job) CommandQueryTopics(s *discordgo.Session, msg *discordgo.Message, c
 
 		url := fmt.Sprintf("%s/t/%d", j.URL, t.ID)
 		line := fmt.Sprintf("%s - <%s>", t.FancyTitle, url)
-		topicLines = append(topicLines, line)
+		s.ChannelMessageSend(msg.ChannelID, line)
 		log.WithFields(log.Fields{"title": t.FancyTitle, "url": url}).Debug("Found topic")
 	}
-
-	text := strings.Join(topicLines, "\n")
-	s.ChannelMessageSend(msg.ChannelID, text)
 }
