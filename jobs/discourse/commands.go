@@ -31,6 +31,11 @@ func (j *Job) CommandQueryTopics(s *discordgo.Session, msg *discordgo.Message, c
 		log.WithFields(log.Fields{"title": title, "url": url}).Debug("Found topic")
 	}
 
+	if len(topicLines) > 3 {
+		extra := len(topicLines) - 3
+		topicLines = topicLines[:3]
+		topicLines = append(topicLines, fmt.Sprintf("+ %d more", extra))
+	}
 	text := strings.Join(topicLines, "\n")
 	s.ChannelMessageSend(msg.ChannelID, text)
 }
