@@ -5,17 +5,17 @@ import (
 	"strings"
 )
 
-type CommandHandler func(s *discordgo.Session, msg *discordgo.Message, cmd, arg string, q bool)
+type CommandHandler func(s *discordgo.Session, msg *discordgo.Message, cmd, arg string)
 
 func (srv *Service) AddCommand(name string, fn CommandHandler) {
 	srv.Commands[name] = fn
 }
 
-func ParseCommand(s string) (cmd, arg string, query bool) {
+func ParseCommand(s string) (cmd, arg string) {
 	s = strings.TrimSpace(s)
 
-	if len(s) == 0 || (s[0] != '/' && s[0] != '!' && s[0] != '?') {
-		return "", "", false
+	if len(s) == 0 || (s[0] != '!' && s[0] != '?') {
+		return "", ""
 	}
 
 	cmdEnd := strings.Index(s, " ")
@@ -23,15 +23,15 @@ func ParseCommand(s string) (cmd, arg string, query bool) {
 		cmdEnd = len(s)
 	}
 
-	return s[1:cmdEnd], strings.TrimSpace(s[cmdEnd:]), s[0] == '?'
+	return s[:cmdEnd], strings.TrimSpace(s[cmdEnd:])
 }
 
 func (srv *Service) handleMessageCreateWithCommand(s *discordgo.Session, event *discordgo.MessageCreate) {
-	cmd, arg, q := ParseCommand(event.Content)
+	cmd, arg := ParseCommand(event.Content)
 	fn, ok := srv.Commands[cmd]
 	if !ok {
 		return
 	}
 
-	fn(s, event.Message, cmd, arg, q)
+	fn(s, event.Message, cmd, arg)
 }
