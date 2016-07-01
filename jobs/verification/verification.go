@@ -161,7 +161,9 @@ func (j *Job) DiscordInit(srv *discord.Service) {
 				}
 
 				// Make sure the correct Discord username is mentioned
-				if !strings.Contains(post.Cooked, m.Author.Username) {
+				lowerCooked := strings.ToLower(post.Cooked)
+				lowerUsername := strings.ToLower(m.Author.Username)
+				if !strings.Contains(lowerCooked, lowerUsername) {
 					srv.Reply(m.Message, j.Lines.NameNotInPost)
 					break
 				}
